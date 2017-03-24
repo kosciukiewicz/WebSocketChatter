@@ -33,8 +33,6 @@ public class RoomAdapter extends BaseAdapter {
         this.fragments = fragment;
     }
 
-
-
     @Override
     public int getCount() {
         return roomList.size();

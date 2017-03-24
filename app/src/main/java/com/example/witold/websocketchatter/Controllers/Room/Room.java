@@ -1,13 +1,19 @@
 package com.example.witold.websocketchatter.Controllers.Room;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Witold on 2017-03-14.
  */
 
 public class Room {
+    @SerializedName(value = RoomConstants.ROOM_ID)
     private String id;
+    @SerializedName(value = RoomConstants.ROOM_NAME)
     private String name;
+    @SerializedName(value = RoomConstants.MAX_CAPACITY)
     private int maxCapacity;
+    @SerializedName(value = RoomConstants.CLIENTS_COUNT)
     private int clientsCount;
 
     public Room(String id, String name, int maxCapacity, int clientsCount)

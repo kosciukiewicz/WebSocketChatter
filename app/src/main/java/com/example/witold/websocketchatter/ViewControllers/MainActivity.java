@@ -2,6 +2,7 @@ package com.example.witold.websocketchatter.ViewControllers;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.provider.SyncStateContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -14,25 +15,38 @@ import com.example.witold.websocketchatter.Constants.JsonAttributesConstants;
 import com.example.witold.websocketchatter.Constants.MessageTypeConstants;
 import com.example.witold.websocketchatter.Constants.ServerConstants;
 import com.example.witold.websocketchatter.Controllers.JsonGetter;
-import com.example.witold.websocketchatter.Controllers.Room.AdRoomToServerCallback;
-import com.example.witold.websocketchatter.Controllers.Room.RoomHttpController;
+import com.example.witold.websocketchatter.Controllers.Room.HttpControllerHolder;
+import com.example.witold.websocketchatter.Controllers.Room.MapFieldRoomGetter;
+import com.example.witold.websocketchatter.Controllers.Room.Room;
+import com.example.witold.websocketchatter.Controllers.Room.RoomClient;
 import com.example.witold.websocketchatter.Controllers.Room.RoomWebSocketController;
 import com.example.witold.websocketchatter.R;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements AddRoomDialog.AddRoomDialogHolder, NickNameDialog.NicknameDialogHolder, RoomFragment.MessageSendHandler, RoomHttpController.HttpControllerHolder{
+public class MainActivity extends AppCompatActivity implements AddRoomDialog.AddRoomDialogHolder, NickNameDialog.NicknameDialogHolder, RoomFragment.MessageSendHandler, HttpControllerHolder {
     private FragmentTransaction fragmentTransaction;
     private Stack<Fragment> fragments;
     private JoinRoomFragments joinRoomFragment;
     private RoomFragment roomFragment;
     private WebSocketConnection mConnection;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -219,10 +233,27 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
 
     public void addRoomToServer(String roomName, int capacity)
     {
-        new RoomHttpController(getApplicationContext()).AddNewRoomToServer("/Room", ArgumentStringGetter.getArgumentsForAddRoomToServer(roomName, capacity), new AdRoomToServerCallback() {
+        Retrofit.Builder builder = new Retrofit.Builder().baseUrl(ServerConstants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create());
+
+        Retrofit retrofit = builder.build();
+        RoomClient roomClient = retrofit.create(RoomClient.class);
+        Call<ResponseBody> call = roomClient.addRoomTOServer(MapFieldRoomGetter.getMapFieldsForAddRoomToServer(roomName, capacity));
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void done(String message) {
-                Toast.makeText(getApplicationContext(), "" + message, Toast.LENGTH_LONG).show();
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    Toast.makeText(getApplicationContext(), "" + response.body().string(), Toast.LENGTH_LONG).show();
+                }catch(IOException e)
+                {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                onError();
+                t.printStackTrace();
             }
         });
     }
