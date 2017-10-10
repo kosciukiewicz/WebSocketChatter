@@ -2,7 +2,7 @@ package com.example.witold.websocketchatter.Constants;
 
 import android.util.Log;
 
-import com.example.witold.websocketchatter.Controllers.Room.RoomConstants;
+import com.example.witold.websocketchatter.Room.RoomProvider.RoomConstants;
 
 /**
  * Created by Witold on 2017-03-17.

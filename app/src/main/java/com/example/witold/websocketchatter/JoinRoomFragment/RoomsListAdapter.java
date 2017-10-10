@@ -1,4 +1,4 @@
-package com.example.witold.websocketchatter.ViewControllers;
+package com.example.witold.websocketchatter.JoinRoomFragment;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.example.witold.websocketchatter.Controllers.Room.Room;
+import com.example.witold.websocketchatter.Room.Room;
 import com.example.witold.websocketchatter.R;
 
 import java.util.List;
@@ -19,14 +19,14 @@ import butterknife.ButterKnife;
  * Created by Witold on 2017-03-14.
  */
 
-public class RoomAdapter extends BaseAdapter {
+public class RoomsListAdapter extends BaseAdapter {
     private List<Room> roomList;
     private LayoutInflater inflater;
     Context context;
-    JoinRoomFragments fragments;
+    JoinRoomFragment fragments;
 
 
-    public RoomAdapter(Context activity, List<Room> roomList, JoinRoomFragments fragment) {
+    public RoomsListAdapter(Context activity, List<Room> roomList, JoinRoomFragment fragment) {
         this.context = activity;
         this.roomList = roomList;
         this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -54,12 +54,7 @@ public class RoomAdapter extends BaseAdapter {
         ViewHolder viewHolder = new ViewHolder(newView);
         viewHolder.textViewRoomName.setText(roomList.get(position).getName());
         viewHolder.textViewRoomProperty.setText(roomList.get(position).getClientsCount() + "/" + roomList.get(position).getMaxCapacity());
-        newView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fragments.showNickNameDialoToLoginToChosenRoom(roomList.get(position).getId());
-            }
-        });
+        
         return newView;
     }
 

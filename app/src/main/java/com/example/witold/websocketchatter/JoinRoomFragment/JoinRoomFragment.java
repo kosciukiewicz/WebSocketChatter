@@ -1,7 +1,6 @@
-package com.example.witold.websocketchatter.ViewControllers;
+package com.example.witold.websocketchatter.JoinRoomFragment;
 
 import android.content.Context;
-import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -9,16 +8,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.witold.websocketchatter.Constants.ServerConstants;
-import com.example.witold.websocketchatter.Controllers.Room.HttpControllerHolder;
-import com.example.witold.websocketchatter.Controllers.Room.Room;
-import com.example.witold.websocketchatter.Controllers.Room.RoomClient;
+import com.example.witold.websocketchatter.Room.RoomProvider.HttpControllerHolder;
+import com.example.witold.websocketchatter.Room.Room;
+import com.example.witold.websocketchatter.Room.RoomProvider.RoomClient;
 import com.example.witold.websocketchatter.R;
 
 import java.util.List;
@@ -34,7 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.witold.websocketchatter.R.id.swipeContainer;
 
-public class JoinRoomFragments extends Fragment {
+public class JoinRoomFragment extends Fragment {
     @BindView(R.id.listViewRooms)
     ListView listViewRooms;
     @BindView(R.id.floatingActionButtonAddRoom)
@@ -113,15 +112,24 @@ public class JoinRoomFragments extends Fragment {
     }
 
     private void setListViewRoomsAdapter(List<Room> rooms) {
-        RoomAdapter adapter = new RoomAdapter(getContext(), rooms, this);
+        RoomsListAdapter adapter = new RoomsListAdapter(getContext(), rooms, this);
+
+        listViewRooms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showNickNameDialoToLoginToChosenRoom(((Room)adapterView.getItemAtPosition(i)).getId());
+            }
+    });
+
         listViewRooms.setAdapter(adapter);
+
     }
 
-    public void showNickNameDialoToLoginToChosenRoom(String roomID) // method called by RoomAdapter
+    public void showNickNameDialoToLoginToChosenRoom(String roomID) // method called by RoomsListAdapter
     {
         Bundle bundle = new Bundle();
         bundle.putString("roomId", roomID);
-        DialogFragment newFragment = new NickNameDialog();
+        DialogFragment newFragment = new ChooseNicknameDialog();
         newFragment.setArguments(bundle);
         newFragment.show(getActivity().getSupportFragmentManager(), "");
         //connectionHandler.startNicknameDialog(roomID); //connecting to room method in main activity

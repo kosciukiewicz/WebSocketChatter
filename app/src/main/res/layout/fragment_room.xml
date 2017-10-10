@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.witold.websocketchatter.ViewControllers.RoomFragment">
+    tools:context="com.example.witold.websocketchatter.ChatFragment.ChatFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -10,27 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center">
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_above="@+id/editTextWriteMessage">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=""
-            android:textSize="22dp"
-            android:id="@+id/textViewChat"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_above="@+id/buttonSend" />
-        </ScrollView>
 
         <EditText
             android:layout_width="wrap_content"
@@ -51,5 +30,14 @@
             android:layout_alignBottom="@+id/editTextWriteMessage"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/listViewMessages"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:layout_above="@+id/editTextWriteMessage" />
     </RelativeLayout>
 </FrameLayout>

@@ -1,4 +1,4 @@
-package com.example.witold.websocketchatter.Controllers.Room;
+package com.example.witold.websocketchatter.Message.MessageWebSocketProvider;
 
 import org.json.JSONObject;
 

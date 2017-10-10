@@ -1,4 +1,4 @@
-package com.example.witold.websocketchatter.ViewControllers;
+package com.example.witold.websocketchatter.Message.MessageWebSocketProvider;
 
 /**
  * Created by Witold on 2017-03-11.

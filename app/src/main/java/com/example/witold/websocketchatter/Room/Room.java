@@ -1,5 +1,6 @@
-package com.example.witold.websocketchatter.Controllers.Room;
+package com.example.witold.websocketchatter.Room;
 
+import com.example.witold.websocketchatter.Room.RoomProvider.RoomConstants;
 import com.google.gson.annotations.SerializedName;
 
 /**

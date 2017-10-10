@@ -1,8 +1,9 @@
-package com.example.witold.websocketchatter.Controllers.Room;
+package com.example.witold.websocketchatter.Room.RoomProvider;
+
+import com.example.witold.websocketchatter.Room.RoomProvider.RoomConstants;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by Witold on 2017-03-24.

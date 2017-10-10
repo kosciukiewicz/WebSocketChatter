@@ -1,8 +1,7 @@
-package com.example.witold.websocketchatter.ViewControllers;
+package com.example.witold.websocketchatter.MainActivity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.provider.SyncStateContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -10,24 +9,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.witold.websocketchatter.Constants.ArgumentStringGetter;
+import com.example.witold.websocketchatter.ChatFragment.ChatFragment;
 import com.example.witold.websocketchatter.Constants.JsonAttributesConstants;
 import com.example.witold.websocketchatter.Constants.MessageTypeConstants;
 import com.example.witold.websocketchatter.Constants.ServerConstants;
-import com.example.witold.websocketchatter.Controllers.JsonGetter;
-import com.example.witold.websocketchatter.Controllers.Room.HttpControllerHolder;
-import com.example.witold.websocketchatter.Controllers.Room.MapFieldRoomGetter;
-import com.example.witold.websocketchatter.Controllers.Room.Room;
-import com.example.witold.websocketchatter.Controllers.Room.RoomClient;
-import com.example.witold.websocketchatter.Controllers.Room.RoomWebSocketController;
+import com.example.witold.websocketchatter.Message.JsonGetter;
+import com.example.witold.websocketchatter.Room.RoomProvider.HttpControllerHolder;
+import com.example.witold.websocketchatter.Room.RoomProvider.MapFieldRoomGetter;
+import com.example.witold.websocketchatter.Room.RoomProvider.RoomClient;
+import com.example.witold.websocketchatter.Message.MessageWebSocketProvider.RoomWebSocketController;
 import com.example.witold.websocketchatter.R;
+import com.example.witold.websocketchatter.JoinRoomFragment.AddRoomDialog;
+import com.example.witold.websocketchatter.JoinRoomFragment.JoinRoomFragment;
+import com.example.witold.websocketchatter.JoinRoomFragment.ChooseNicknameDialog;
+import com.example.witold.websocketchatter.Message.MessageWebSocketProvider.WebSocketConnectionCallback;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
@@ -40,11 +40,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements AddRoomDialog.AddRoomDialogHolder, NickNameDialog.NicknameDialogHolder, RoomFragment.MessageSendHandler, HttpControllerHolder {
+public class MainActivity extends AppCompatActivity implements AddRoomDialog.AddRoomDialogHolder, ChooseNicknameDialog.NicknameDialogHolder, ChatFragment.MessageSendHandler, HttpControllerHolder {
     private FragmentTransaction fragmentTransaction;
     private Stack<Fragment> fragments;
-    private JoinRoomFragments joinRoomFragment;
-    private RoomFragment roomFragment;
+    private JoinRoomFragment joinRoomFragment;
+    private ChatFragment chatFragment;
     private WebSocketConnection mConnection;
 
 
@@ -64,13 +64,13 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.fragmentContainer, joinRoomFragment);
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragmentContainer, roomFragment);
+        fragmentTransaction.add(R.id.fragmentContainer, chatFragment);
     }
 
     private void detachAll()
     {
         fragmentTransaction.detach(joinRoomFragment);
-        fragmentTransaction.detach(roomFragment);
+        fragmentTransaction.detach(chatFragment);
     }
 
     private void checkIfStackContainsFragmentAndRemoveIt(Fragment fragment) //Żeby fragmenty nie powtarzały się na stosie;
@@ -89,11 +89,12 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
         fragments.add(fragment);
     }
 
-    private void attachChatFragment() {
+    private void attachChatFragment(String nickname) {
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         detachAll();
-        fragmentTransaction.attach(roomFragment);
+        fragmentTransaction.attach(chatFragment);
         fragmentTransaction.commit();
+        chatFragment.setNick(nickname);
     }
 
     private void attachLastFragmentFromStack() {
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
         {
             attachLastFragmentFromStack();
         }
-        if(roomFragment.isVisible())
+        if(chatFragment.isVisible())
         {
             attachFragmentAndAddToStack(joinRoomFragment);
         }
@@ -121,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
 
     private void initializeFragments()
     {
-        joinRoomFragment = new JoinRoomFragments();
-        roomFragment = new RoomFragment();
+        joinRoomFragment = new JoinRoomFragment();
+        chatFragment = new ChatFragment();
     }
 
     private void initializeComponents()
@@ -182,7 +183,17 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
             case MessageTypeConstants.TEXT:
             {
                 try {
-                    roomFragment.receiveMessage(jsonObject.getString(JsonAttributesConstants.NICKNAME), jsonObject.getString(JsonAttributesConstants.TEXT));
+                    chatFragment.receiveMessage(jsonObject.getString(JsonAttributesConstants.NICKNAME), jsonObject.getString(JsonAttributesConstants.TEXT));
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            break;
+            case MessageTypeConstants.JOIN_TEXT:
+            {
+                try {
+                    chatFragment.receiveJoinMessage(jsonObject.getString(JsonAttributesConstants.NICKNAME), jsonObject.getString(JsonAttributesConstants.TEXT));
                 }catch (Exception e)
                 {
                     e.printStackTrace();
@@ -212,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements AddRoomDialog.Add
         {
             RoomWebSocketController.JoinRoom(mConnection,JsonGetter.getJsonObjectForJoinRoom(roomId, nick));
         }
-        attachChatFragment();
+        attachChatFragment(nick);
         }
 
     @Override

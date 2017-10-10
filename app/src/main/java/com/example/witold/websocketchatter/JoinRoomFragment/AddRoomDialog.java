@@ -1,12 +1,12 @@
-package com.example.witold.websocketchatter.ViewControllers;
+package com.example.witold.websocketchatter.JoinRoomFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -15,32 +15,31 @@ import android.widget.EditText;
 import com.example.witold.websocketchatter.R;
 
 /**
- * Created by Witold on 2017-03-14.
+ * Created by Witold on 2017-03-17.
  */
 
-public class NickNameDialog extends  DialogFragment{
-
-    NicknameDialogHolder holder;
+public class AddRoomDialog extends DialogFragment {
+    AddRoomDialogHolder holder;
 
     @Nullable
 
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        final View view = inflater.inflate(R.layout.nickname_dialog_layout, null);
+        final View view = inflater.inflate(R.layout.add_room_dialog, null);
         builder.setView(view)
-                .setTitle("Choose your nickname")
+                .setTitle("Add Room")
                 // Add action buttons
                 .setPositiveButton("Ok", null)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        NickNameDialog.this.getDialog().cancel();
+                        AddRoomDialog.this.getDialog().cancel();
                     }
                 });
 
@@ -55,7 +54,7 @@ public class NickNameDialog extends  DialogFragment{
                     public void onClick(View view) {
                         if(validateEditTexts())
                         {
-                            holder.connectToRoomWithNickname(getArguments().getString("roomId"), ((EditText)getDialog().findViewById(R.id.editTextDialogNickname)).getText().toString() );
+                            holder.addRoomToServer(((EditText)getDialog().findViewById(R.id.editTextRoomName)).getText().toString(),Integer.parseInt(((EditText)getDialog().findViewById(R.id.editTextDialogMaxCapacity)).getText().toString()));
                             getDialog().dismiss();
                         }
                     }
@@ -67,25 +66,32 @@ public class NickNameDialog extends  DialogFragment{
 
     private boolean validateEditTexts()
     {
-        EditText nickname = ((EditText)getDialog().findViewById(R.id.editTextDialogNickname));
+        EditText roomName = ((EditText)getDialog().findViewById(R.id.editTextRoomName));
+        EditText capacity = ((EditText)getDialog().findViewById(R.id.editTextDialogMaxCapacity));
 
-        if(nickname.getText().toString().equals(""))
+        if(roomName.getText().toString().equals(""))
         {
-            nickname.setError("That field is required");
+            roomName.setError("That field is required");
+            return false;
+        }
+        if(capacity.getText().toString().equals(""))
+        {
+            capacity.setError("That field is required");
             return false;
         }
         return true;
     }
 
 
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        holder = (NicknameDialogHolder)context;
+        holder = (AddRoomDialogHolder)context;
     }
 
-    public interface NicknameDialogHolder
+    public interface AddRoomDialogHolder
     {
-        public abstract void connectToRoomWithNickname(String roomId, String nick);
+        public abstract void addRoomToServer(String roomName, int capacity);
     }
 }

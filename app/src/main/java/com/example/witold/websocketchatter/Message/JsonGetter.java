@@ -1,4 +1,4 @@
-package com.example.witold.websocketchatter.Controllers;
+package com.example.witold.websocketchatter.Message;
 
 import com.example.witold.websocketchatter.Constants.JsonAttributesConstants;
 import com.example.witold.websocketchatter.Constants.MessageTypeConstants;
@@ -37,6 +37,4 @@ public class JsonGetter {
             return null;
         }
     }
-
-
 }
